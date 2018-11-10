@@ -6,3 +6,5 @@ Using socket.io, express and node.js
 $ npm install
 $ node ./bin/www
 ```
+
+### To see a working demo site, goto [Chat App!](https://kengkai.umate.xyz/).
