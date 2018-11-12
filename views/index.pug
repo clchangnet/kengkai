@@ -1,26 +1,66 @@
 extends layout
 
 block content
-  h1= title
-  p I talking U, U talking Me ...
-  br
-
-  ul#messages
-  form(action='')
-    input(id="m" autocomplete="off")
-    button Send
+  .wrapper
+    nav#nav.nav
+      .default-nav
+        .main-nav
+          .toggle
+          .main-nav-item
+            a.main-nav-item-link(href="#") kengkai.umate.xyz
+          .options
+    .inner#inner
+      .content#content
+        div#messages
+    .bottom#bottom
+      form(action='')
+        textarea.input#input
+        button.send#send
 
   script(src="/javascripts/socket.io.js")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js")
   script.
     $(function () {
         var socket = io();
+        socket.on('connect', () => {
+          socketId = socket.id;
+        });
         $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
+          message = {
+            'id': socketId,
+            'chatmsg': $('#input').val()
+          };
+          // socket.emit('chat message', $('#input').val());
+          socket.emit('chat message', JSON.stringify(message));
+          $('#input').val('');
           return false;
         });
         socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
+          parsedMsg = JSON.parse(msg);
+          who = parsedMsg.id === socketId ? 'me' : 'them';
+          htmlmsg = `<div class="message-wrapper ${who}">
+              <div class="circle-wrapper animated bounceIn"></div>
+              <div class="text-wrapper">...</div>
+            </div>`;
+          $('#messages').append($(htmlmsg));
+          safeText(parsedMsg.chatmsg);
+          animateText();
+          scrollBottom();
         });
     });
+    function animateText() {
+      setTimeout(() => {
+        $('#content').find('.message-wrapper').last().find('.text-wrapper').addClass('animated fadeIn');
+      }, 350)
+    };
+    function scrollBottom() {
+      $($('#inner')).animate({
+        scrollTop: $('#content').offset().top + $('#content').outerHeight(true)
+      }, {
+        queue: false,
+        duration: 'ease'
+      });
+    };
+    function safeText(text) {
+      $('#content').find('.message-wrapper').last().find('.text-wrapper').text(text);
+    }
