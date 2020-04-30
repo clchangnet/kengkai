@@ -1,0 +1,19 @@
+version: '3'
+services:
+  nodejs-kengkai:
+    build:
+      context: ~/apps/nodejs/kengkai
+    container_name: nodejs-kengkai
+    restart: unless-stopped
+    expose:
+      - "3001"
+    volumes:
+      - ~/apps/nodejs/kengkai:/home/nodejs/kengkai
+      - /home/nodejs/kengkai/node_modules
+    environment:
+      VIRTUAL_HOST: kengkai.umate.xyz
+      VIRTUAL_PORT: 3001
+      LETSENCRYPT_HOST: kengkai.umate.xyz
+      LETSENCRYPT_EMAIL: me@kengkai.umate.xyz
+      NODE_ENV: development
+      NODE_PORT: 3001
